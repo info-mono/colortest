@@ -1,0 +1,8 @@
+{
+  "name": "emwave",
+  "version": "v1.0.0",
+  "description": "Customizable Emwave",
+  "global": "true",
+  "scripts": ["bin/emwave"],
+  "install": "make install"
+}

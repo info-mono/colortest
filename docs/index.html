@@ -1,0 +1,145 @@
+#!/bin/sh
+
+
+TEXT="${1:- gYw }"
+SEPARATOR="${2- }"
+FOREGROUND_MODES="${3:-normal both}"
+BACKGROUND_MODES="${4:-normal}"
+FOREGROUND_ORDER="${5:-label none 0 1 2 3 4 5 6 7}"
+BACKGROUND_ORDER="${6:-$FOREGROUND_ORDER}"
+
+case "$FOREGROUND_ORDER" in
+	*label*)
+		case "$FOREGROUND_MODES" in
+			*bo*) FOREGROUND_MODES_BOLD='true' ;;
+		esac
+	;;
+esac
+
+[ "${#TEXT}" -ge '4' ] && case "$BACKGROUND_ORDER" in
+	*label*)
+		i='4'
+
+		while [ "$i" -lt "${#TEXT}" ]; do
+			PADDING="$PADDING "
+
+			i=$(( i + 1 ))
+		done
+	;;
+esac
+
+
+for foreground in $FOREGROUND_ORDER; do
+	for foreground_mode in $FOREGROUND_MODES; do
+		if [ "$foreground" = 'none' ] || [ "$foreground" = 'label' ]; then
+			[ "$foreground_mode" = 'bright' ] || [ "$foreground_mode" = 'bold' ] || [ "$foreground_mode" = 'both' ] && continue
+
+			foreground_style=''
+		else
+			case "$foreground_mode" in
+				'normal') foreground_style="3$foreground"   ;;
+				'bright') foreground_style="9$foreground"   ;;
+				'bold')   foreground_style="1;3$foreground" ;;
+				'both')   foreground_style="1;9$foreground" ;;
+			esac
+		fi
+
+		[ "$foreground" = 'label' ] && [ "${#TEXT}" -lt '4' ] && continue
+
+		[ "$newline" = 'true' ] && print="$print\n"
+
+		for background in $BACKGROUND_ORDER; do
+			background_noned=''
+			background_labeled=''
+
+			for background_mode in $BACKGROUND_MODES; do
+				if [ "$background" = 'none' ] || [ "$background" = 'label' ]; then
+					if [ "$background_noned" = 'true' ]; then
+						continue
+					else
+						background_noned='true'
+					fi
+
+					if [ "$background_labeled" = 'true' ]; then
+						continue
+					else
+						background_labeled='true'
+					fi
+
+					background_style=''
+				else
+					case "$background_mode" in
+						'normal') background_style="4$background"  ;;
+						'bright') background_style="10$background" ;;
+					esac
+				fi
+
+				[ "$separator" = 'true' ] && print="$print$SEPARATOR"
+
+				if [ "$foreground" = 'label' ] && [ "$background" = 'label' ]; then
+					[ "$FOREGROUND_MODES_BOLD" = 'true' ] && print="$print  "
+
+					print="$print   "
+				elif [ "$foreground" = 'label' ]; then
+					[ "${#background_style}" -lt '3' ] && print="$print "
+
+					[ "$background" = 'none' ] && print="$print  "
+
+					print="$print$PADDING${background_style}m"
+				elif [ "$background" = 'label' ]; then
+					[ "$FOREGROUND_MODES_BOLD" = 'true' ] && case "$foreground_mode" in
+						*bo*) ;;
+						*)
+							print="$print  "
+						;;
+					esac
+
+					[ -z "$foreground_style" ] && print="$print  "
+
+					print="$print${foreground_style}m"
+				else
+					print="$print\033[0${background_style:+;$background_style}${foreground_style:+;$foreground_style}m$TEXT\033[0m"
+				fi
+
+				separator='true'
+			done
+		done
+
+		separator=''
+		newline='true'
+	done
+done
+
+printf '%b' "$print"
+
+
+#
+#                          [1mColorTest[0m
+#                    [3mCustomizable colortest[0m
+#
+#           m   40m   41m   42m   43m   44m   45m   46m   47m
+#     m [0m gYw [0m [0;40m gYw [0m [0;41m gYw [0m [0;42m gYw [0m [0;43m gYw [0m [0;44m gYw [0m [0;45m gYw [0m [0;46m gYw [0m [0;47m gYw [0m
+#   30m [0;30m gYw [0m [0;40;30m gYw [0m [0;41;30m gYw [0m [0;42;30m gYw [0m [0;43;30m gYw [0m [0;44;30m gYw [0m [0;45;30m gYw [0m [0;46;30m gYw [0m [0;47;30m gYw [0m
+# 1;90m [0;1;90m gYw [0m [0;40;1;90m gYw [0m [0;41;1;90m gYw [0m [0;42;1;90m gYw [0m [0;43;1;90m gYw [0m [0;44;1;90m gYw [0m [0;45;1;90m gYw [0m [0;46;1;90m gYw [0m [0;47;1;90m gYw [0m
+#   31m [0;31m gYw [0m [0;40;31m gYw [0m [0;41;31m gYw [0m [0;42;31m gYw [0m [0;43;31m gYw [0m [0;44;31m gYw [0m [0;45;31m gYw [0m [0;46;31m gYw [0m [0;47;31m gYw [0m
+# 1;91m [0;1;91m gYw [0m [0;40;1;91m gYw [0m [0;41;1;91m gYw [0m [0;42;1;91m gYw [0m [0;43;1;91m gYw [0m [0;44;1;91m gYw [0m [0;45;1;91m gYw [0m [0;46;1;91m gYw [0m [0;47;1;91m gYw [0m
+#   32m [0;32m gYw [0m [0;40;32m gYw [0m [0;41;32m gYw [0m [0;42;32m gYw [0m [0;43;32m gYw [0m [0;44;32m gYw [0m [0;45;32m gYw [0m [0;46;32m gYw [0m [0;47;32m gYw [0m
+# 1;92m [0;1;92m gYw [0m [0;40;1;92m gYw [0m [0;41;1;92m gYw [0m [0;42;1;92m gYw [0m [0;43;1;92m gYw [0m [0;44;1;92m gYw [0m [0;45;1;92m gYw [0m [0;46;1;92m gYw [0m [0;47;1;92m gYw [0m
+#   33m [0;33m gYw [0m [0;40;33m gYw [0m [0;41;33m gYw [0m [0;42;33m gYw [0m [0;43;33m gYw [0m [0;44;33m gYw [0m [0;45;33m gYw [0m [0;46;33m gYw [0m [0;47;33m gYw [0m
+# 1;93m [0;1;93m gYw [0m [0;40;1;93m gYw [0m [0;41;1;93m gYw [0m [0;42;1;93m gYw [0m [0;43;1;93m gYw [0m [0;44;1;93m gYw [0m [0;45;1;93m gYw [0m [0;46;1;93m gYw [0m [0;47;1;93m gYw [0m
+#   34m [0;34m gYw [0m [0;40;34m gYw [0m [0;41;34m gYw [0m [0;42;34m gYw [0m [0;43;34m gYw [0m [0;44;34m gYw [0m [0;45;34m gYw [0m [0;46;34m gYw [0m [0;47;34m gYw [0m
+# 1;94m [0;1;94m gYw [0m [0;40;1;94m gYw [0m [0;41;1;94m gYw [0m [0;42;1;94m gYw [0m [0;43;1;94m gYw [0m [0;44;1;94m gYw [0m [0;45;1;94m gYw [0m [0;46;1;94m gYw [0m [0;47;1;94m gYw [0m
+#   35m [0;35m gYw [0m [0;40;35m gYw [0m [0;41;35m gYw [0m [0;42;35m gYw [0m [0;43;35m gYw [0m [0;44;35m gYw [0m [0;45;35m gYw [0m [0;46;35m gYw [0m [0;47;35m gYw [0m
+# 1;95m [0;1;95m gYw [0m [0;40;1;95m gYw [0m [0;41;1;95m gYw [0m [0;42;1;95m gYw [0m [0;43;1;95m gYw [0m [0;44;1;95m gYw [0m [0;45;1;95m gYw [0m [0;46;1;95m gYw [0m [0;47;1;95m gYw [0m
+#   36m [0;36m gYw [0m [0;40;36m gYw [0m [0;41;36m gYw [0m [0;42;36m gYw [0m [0;43;36m gYw [0m [0;44;36m gYw [0m [0;45;36m gYw [0m [0;46;36m gYw [0m [0;47;36m gYw [0m
+# 1;96m [0;1;96m gYw [0m [0;40;1;96m gYw [0m [0;41;1;96m gYw [0m [0;42;1;96m gYw [0m [0;43;1;96m gYw [0m [0;44;1;96m gYw [0m [0;45;1;96m gYw [0m [0;46;1;96m gYw [0m [0;47;1;96m gYw [0m
+#   37m [0;37m gYw [0m [0;40;37m gYw [0m [0;41;37m gYw [0m [0;42;37m gYw [0m [0;43;37m gYw [0m [0;44;37m gYw [0m [0;45;37m gYw [0m [0;46;37m gYw [0m [0;47;37m gYw [0m
+# 1;97m [0;1;97m gYw [0m [0;40;1;97m gYw [0m [0;41;1;97m gYw [0m [0;42;1;97m gYw [0m [0;43;1;97m gYw [0m [0;44;1;97m gYw [0m [0;45;1;97m gYw [0m [0;46;1;97m gYw [0m [0;47;1;97m gYw [0m
+#
+# [1mUsage:[0m
+#     sh -c "$(curl -fsLS https://info-mono.github.io/colortest)" -- <options>
+#
+# [1mAbout:[0m 
+#     #TODO
+#
+# [1mURL:[0m [3;4;96mhttps://github.com/info-mono/colortest[0m

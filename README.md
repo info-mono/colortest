@@ -7,19 +7,31 @@
 
 ## 💡 About
 
-**Colortest** #TODO
+**Colortest** is a tool to quickly show all your terminal colors.
 
 Try it:
+
+```sh
+sh -c "$(curl -fsLS https://info-mono.github.io/colortest)"
+```
 
 ```sh
 sh -c "$(curl -fsLS https://info-mono.github.io/colortest)" -- <options>
 ```
 
-#TODO
+You can just `curl` some pre-made colortest:
+
+```sh
+curl -fsLS https://info-mono.github.io/colortest/<file>
+```
+
+E.g:
 
 ```sh
 curl -fsLS https://info-mono.github.io/colortest/default
 ```
+
+> **Note** The full list of pre-made colortest files can be found [here](https://github.com/info-mono/colortest/tree/main/docs).
 
 ## 🚀 Setup
 
@@ -67,7 +79,24 @@ Run `colortest` in the terminal:
 colortest
 ```
 
-#TODO
+```sh
+colortest <text> <separator> <foreground_mode> <background_mode> <foreground_order> <background_order>
+```
+
+> **Note**
+>
+> - `<text>` **:** String to display.
+> - `<separator>` **:** String to use as separator.
+> - `<foreground_mode>` **:** String that is a list of foreground modes to use (`normal`, `bright`, `bold`, `both`).
+> - `<background_mode>` **:** String that is a list of background modes to use (`normal`, `bright`).
+> - `<foreground_order>` **:** String that is a list of foreground colors to use (`label`, `none`, `0`..`7`).
+> - `<background_order>` **:** String that is a list of background colors to use (`label`, `none`, `0`..`7`).
+>
+> Default options:
+>
+> ```sh
+> colortest ' gYw ' ' ' 'normal both' 'normal' 'label none 0 1 2 3 4 5 6 7' 'label none 0 1 2 3 4 5 6 7'
+> ```
 
 <br><br><br><br>
 

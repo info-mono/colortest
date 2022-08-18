@@ -1,4 +1,4 @@
-<p align="center"><a href="https://github.com/info-mono/colortest"><img src=""></a></p>
+<p align="center"><a href="https://github.com/info-mono/colortest"><img src="https://user-images.githubusercontent.com/43980777/185287348-305e05a0-e9ab-42a8-8e31-a8bf09e16d66.png"></a></p>
 <p align="center">Customizable Colortest</p>
 <p align="center">
   <a href="https://github.com/info-mono/colortest/blob/main/LICENSE"><img src="https://img.shields.io/github/license/info-mono/colortest?labelColor=383838&color=585858&style=for-the-badge" alt="License: GPL-3.0"></a>

@@ -3,7 +3,7 @@
 {
   default: 'gYw',
   'stars': '***',
-}.each do |text_name, text|
+}.each do |string_name, string|
   {
     'minimal': 'normal',
     'simple': 'normal bright',
@@ -23,9 +23,9 @@
         'spectrum_no-label': 'none 0 7 1 3 2 6 4 5',
         'spectrum': 'label none 0 7 1 3 2 6 4 5',
       }.each do |order_name, order|
-        filename = [fg_name, bg_name, order_name, text_name].select { _1 != :default }.join('_')
+        filename = [fg_name, bg_name, order_name, string_name].select { _1 != :default }.join('_')
         filename = filename == '' ? 'default' : filename
-        `#{__dir__}/bin/colortest ' #{text} ' ' ' '#{fg_mode}' '#{bg_mode}' '#{order}' > #{__dir__}/docs/#{filename}`
+        `#{__dir__}/bin/colortest -s ' #{text} ' -S ' ' -f '#{fg_mode}' -b '#{bg_mode}' -F '#{order}' > #{__dir__}/docs/#{filename}`
       end
     end
   end

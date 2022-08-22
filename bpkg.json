@@ -1,8 +1,9 @@
 {
-  "name": "emwave",
-  "version": "v1.0.0",
-  "description": "Customizable Emwave",
+  "name": "colortest",
+  "version": "v1.1.0",
+  "description": "Customizable Colortest",
   "global": "true",
-  "scripts": ["bin/emwave"],
+  "scripts": ["bin/colortest"],
+  "files": ["man/colortest.1"],
   "install": "make install"
 }

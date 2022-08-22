@@ -77,27 +77,25 @@ basher install info-mono/colortest
 Run `colortest` in the terminal:
 
 ```sh
-colortest
+colortest <options>
 ```
 
-```sh
-colortest <text> <separator> <foreground_mode> <background_mode> <foreground_order> <background_order>
+```console
+Options:
+  -h, --help                     Print this help message
+  -s, --string <string>          Set print string
+  -S, --separator <separator>    Set separator string
+  -f, --fg-modes <fg-modes>      Set foreground modes list
+                                 (normal, bright, bold, both)
+  -b, --bg-modes <bg-modes>      Set background modes list
+                                 (normal, bright)
+  -F, --fg-colors <fg-colors>    Set foreground colors list
+                                 (0, 1, 2, 3, 4, 5, 6, 7, none, label)
+  -B, --bg-colors <bg-colors>    Set background colors list
+                                 (0, 1, 2, 3, 4, 5, 6, 7, none, label)
 ```
 
-> **Note**
->
-> - `<text>` **:** String to display.
-> - `<separator>` **:** String to use as separator.
-> - `<foreground_mode>` **:** String that is a list of foreground modes to use (`normal`, `bright`, `bold`, `both`).
-> - `<background_mode>` **:** String that is a list of background modes to use (`normal`, `bright`).
-> - `<foreground_order>` **:** String that is a list of foreground colors to use (`label`, `none`, `0`..`7`).
-> - `<background_order>` **:** String that is a list of background colors to use (`label`, `none`, `0`..`7`).
->
-> Default options:
->
-> ```sh
-> colortest ' gYw ' ' ' 'normal both' 'normal' 'label none 0 1 2 3 4 5 6 7' 'label none 0 1 2 3 4 5 6 7'
-> ```
+> **Note** List are separated by space.
 
 <br><br><br><br>
 

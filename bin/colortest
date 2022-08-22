@@ -1,27 +1,92 @@
 #!/bin/sh
 
+string=' gYw '
+separator=' '
+foreground_modes='normal both'
+background_modes='normal'
+foreground_colors='label none 0 1 2 3 4 5 6 7'
 
-TEXT="${1:- gYw }"
-SEPARATOR="${2- }"
-FOREGROUND_MODES="${3:-normal both}"
-BACKGROUND_MODES="${4:-normal}"
-FOREGROUND_ORDER="${5:-label none 0 1 2 3 4 5 6 7}"
-BACKGROUND_ORDER="${6:-$FOREGROUND_ORDER}"
+help="\033[1mUsage:\033[0m colortest <options>
 
-case "$FOREGROUND_ORDER" in
+Show all your terminal colors.
+
+\033[1mOption:\033[0m
+  -h, --help                     Print this help message
+  -s, --string <string>          Set print string
+  -S, --separator <separator>    Set separator string
+  -f, --fg-modes <fg-modes>      Set foreground modes list
+                                 (normal, bright, bold, both)
+  -b, --bg-modes <bg-modes>      Set background modes list
+                                 (normal, bright)
+  -F, --fg-colors <fg-colors>    Set foreground colors list
+                                 (0, 1, 2, 3, 4, 5, 6, 7, none, label)
+  -B, --bg-colors <bg-colors>    Set background colors list
+                                 (0, 1, 2, 3, 4, 5, 6, 7, none, label)
+
+\033[3;37mList are separated by space.\033[0m"
+
+while :; do
+	case "${1:-}" in
+		-s|--string)
+			shift
+			string="${1}"
+			shift
+		;;
+		-S|--separator)
+			shift
+			separator="${1}"
+			shift
+		;;
+		-f|--fg-modes)
+			shift
+			foreground_modes="${1}"
+			shift
+		;;
+		-b|--bg-modes)
+			shift
+			background_modes="${1}"
+			shift
+		;;
+		-F|--fg-colors)
+			shift
+			foreground_colors="${1}"
+			shift
+		;;
+		-B|--bg-colors)
+			shift
+			background_colors="${1}"
+			shift
+		;;
+		-h|--help)
+			printf '%b\n' "${help}"
+			exit 0
+		;;
+		'')
+			break
+		;;
+		*)
+			printf '%s\n' "Unknown option: ${1}" >&2
+			exit 2
+		;;
+	esac
+done
+
+background_colors="${background_colors:-${foreground_colors}}"
+
+case "${foreground_colors}" in
 	*label*)
-		case "$FOREGROUND_MODES" in
-			*bo*) FOREGROUND_MODES_BOLD='true' ;;
+		case "${foreground_modes}" in
+			*bo*) foreground_modes_bold='true' ;;
 		esac
 	;;
 esac
 
-[ "${#TEXT}" -ge '4' ] && case "$BACKGROUND_ORDER" in
+[ "${#string}" -ge 4 ] && case "${background_colors}" in
 	*label*)
-		i='4'
+		i=4
 
-		while [ "$i" -lt "${#TEXT}" ]; do
-			PADDING="$PADDING "
+		while [ "${i}" -lt "${#string}" ]; do
+			padding="${padding} "
 
 			i=$(( i + 1 ))
 		done
@@ -29,85 +94,77 @@ esac
 esac
 
 
-for foreground in $FOREGROUND_ORDER; do
-	for foreground_mode in $FOREGROUND_MODES; do
-		if [ "$foreground" = 'none' ] || [ "$foreground" = 'label' ]; then
-			[ "$foreground_mode" = 'bright' ] || [ "$foreground_mode" = 'bold' ] || [ "$foreground_mode" = 'both' ] && continue
+for foreground_color in ${foreground_colors}; do
+	foreground_once=''
+
+	for foreground_mode in ${foreground_modes}; do
+		if [ "${foreground_color}" = 'none' ] || [ "${foreground_color}" = 'label' ]; then
+			[ "${foreground_once}" = 'true' ] && continue
+			foreground_once='true'
 
 			foreground_style=''
 		else
-			case "$foreground_mode" in
-				'normal') foreground_style="3$foreground"   ;;
-				'bright') foreground_style="9$foreground"   ;;
-				'bold')   foreground_style="1;3$foreground" ;;
-				'both')   foreground_style="1;9$foreground" ;;
+			case "${foreground_mode}" in
+				'normal') foreground_style="3${foreground_color}";;
+				'bright') foreground_style="9${foreground_color}";;
+				'bold') foreground_style="1;3${foreground_color}";;
+				'both') foreground_style="1;9${foreground_color}";;
 			esac
 		fi
 
-		[ "$foreground" = 'label' ] && [ "${#TEXT}" -lt '4' ] && continue
+		[ "${foreground_color}" = 'label' ] && [ "${#string}" -lt 4 ] && continue
 
-		[ "$newline" = 'true' ] && print="$print\n"
+		separator_ready=''
 
-		for background in $BACKGROUND_ORDER; do
-			background_noned=''
-			background_labeled=''
+		for background_color in ${background_colors}; do
+			background_once=''
 
-			for background_mode in $BACKGROUND_MODES; do
-				if [ "$background" = 'none' ] || [ "$background" = 'label' ]; then
-					if [ "$background_noned" = 'true' ]; then
-						continue
-					else
-						background_noned='true'
-					fi
-
-					if [ "$background_labeled" = 'true' ]; then
-						continue
-					else
-						background_labeled='true'
-					fi
+			for background_mode in ${background_modes}; do
+				if [ "${background_color}" = 'none' ] || [ "${background_color}" = 'label' ]; then
+					[ "${background_once}" = 'true' ] && continue
+					background_once='true'
 
 					background_style=''
 				else
-					case "$background_mode" in
-						'normal') background_style="4$background"  ;;
-						'bright') background_style="10$background" ;;
+					case "${background_mode}" in
+						'normal') background_style="4${background_color}" ;;
+						'bright') background_style="10${background_color}";;
 					esac
 				fi
 
-				[ "$separator" = 'true' ] && print="$print$SEPARATOR"
+				[ "${separator_ready}" = 'true' ] && colortest="${colortest}${separator}"
 
-				if [ "$foreground" = 'label' ] && [ "$background" = 'label' ]; then
-					[ "$FOREGROUND_MODES_BOLD" = 'true' ] && print="$print  "
+				if [ "${foreground_color}" = 'label' ] && [ "${background_color}" = 'label' ]; then
+					[ "${foreground_modes_bold}" = 'true' ] && colortest="${colortest}  "
 
-					print="$print   "
-				elif [ "$foreground" = 'label' ]; then
-					[ "${#background_style}" -lt '3' ] && print="$print "
+					colortest="${colortest}   "
+				elif [ "${foreground_color}" = 'label' ]; then
+					[ "${#background_style}" -lt '3' ] && colortest="${colortest} "
 
-					[ "$background" = 'none' ] && print="$print  "
+					[ "${background_color}" = 'none' ] && colortest="${colortest}  "
 
-					print="$print$PADDING${background_style}m"
-				elif [ "$background" = 'label' ]; then
-					[ "$FOREGROUND_MODES_BOLD" = 'true' ] && case "$foreground_mode" in
+					colortest="${colortest}${padding}${background_style}m"
+				elif [ "${background_color}" = 'label' ]; then
+					[ "$foreground_modes_bold" = 'true' ] && case "${foreground_mode}" in
 						*bo*) ;;
 						*)
-							print="$print  "
+							colortest="${colortest}  "
 						;;
 					esac
 
-					[ -z "$foreground_style" ] && print="$print  "
+					[ -z "${foreground_style}" ] && colortest="${colortest}  "
 
-					print="$print${foreground_style}m"
+					colortest="${colortest}${foreground_style}m"
 				else
-					print="$print\033[0${background_style:+;$background_style}${foreground_style:+;$foreground_style}m$TEXT\033[0m"
+					colortest="${colortest}\033[0${background_style:+;${background_style}}${foreground_style:+;${foreground_style}}m${string}\033[0m"
 				fi
 
-				separator='true'
+				separator_ready='true'
 			done
 		done
 
-		separator=''
-		newline='true'
+		colortest="${colortest}\n"
 	done
 done
 
-printf '%b' "$print"
+printf '%b' "$colortest"
